@@ -1,0 +1,31 @@
+{
+  "name": "obsidian-simple-accounting",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "main": "main.js",
+  "sideEffects": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "version": "node version-bump.mjs && git add manifest.json versions.json"
+  },
+  "dependencies": {
+    "chart.js": "^4.4.4",
+    "dayjs": "^1.11.13",
+    "vue": "^3.4.37",
+    "vue-chartjs": "^5.3.1"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "5.29.0",
+    "@typescript-eslint/parser": "5.29.0",
+    "@vitejs/plugin-vue": "^5.1.2",
+    "builtin-modules": "3.3.0",
+    "obsidian": "latest",
+    "tslib": "2.4.0",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.1",
+    "vue-tsc": "^2.0.29"
+  }
+}

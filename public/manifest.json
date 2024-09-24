@@ -1,0 +1,10 @@
+{
+	"id": "accounting-helper",
+	"name": "Accounting Helper Plugin",
+	"version": "0.0.1",
+	"minAppVersion": "1.5.0",
+	"description": "Helps create transactions",
+	"author": "Dmitry Nischeta",
+	"authorUrl": "https://github.com/dnischeta",
+	"isDesktopOnly": false
+}
