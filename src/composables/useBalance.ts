@@ -2,6 +2,7 @@ import { readonly, ref } from "vue";
 import { Notice, TFile } from "obsidian";
 import { useObsidian } from "./useObsidian";
 import type { BalanceEntry } from "../types";
+import dayjs from "dayjs";
 
 export const useBalance = () => {
     const obsidian = useObsidian();
@@ -131,5 +132,10 @@ ${calculateNetBalance(balance.assets, balance.liabilities)}${balance.currency}
         return vault.getAbstractFileByPath('Баланс');
     };
 
-    return { submitting: readonly(submitting), submitBalance, getBalance, getAllBalances };
+    const getPreviousMonthBalance = async (month: string): Promise<BalanceEntry | null> => {
+        const previousMonth = dayjs(month).subtract(1, 'month').format('YYYY-MM');
+        return getBalance(previousMonth);
+    };
+
+    return { submitting: readonly(submitting), submitBalance, getBalance, getAllBalances, getPreviousMonthBalance };
 };

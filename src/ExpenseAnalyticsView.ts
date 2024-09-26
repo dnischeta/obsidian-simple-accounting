@@ -1,11 +1,11 @@
 import { ItemView, WorkspaceLeaf } from "obsidian";
 import { createApp, App as VueApp } from 'vue';
-import FormAnalytics from './views/BalanceAnalytics.vue';
+import ExpenseAnalytics from './views/ExpenseAnalytics.vue';
 import obsidianAppPlugin from './vue-plugin';
 
-export const VIEW_ANALYTICS = "analytics-view";
+export const VIEW_EXPENSE_ANALYTICS = "expense-analytics-view";
 
-export class AnalyticsView extends ItemView {
+export class ExpenseAnalyticsView extends ItemView {
   private vueApp?: VueApp;
 
   constructor(leaf: WorkspaceLeaf) {
@@ -13,21 +13,21 @@ export class AnalyticsView extends ItemView {
   }
 
   getIcon() {
-    return "piggy-bank";
+    return "coins";
   }
 
   getViewType() {
-    return VIEW_ANALYTICS;
+    return VIEW_EXPENSE_ANALYTICS;
   }
 
   getDisplayText() {
-    return "Аналитика";
+    return "Аналитика Расходов";
   }
 
   async onOpen() {
     const container = this.containerEl.children[1];
 
-    this.vueApp = createApp(FormAnalytics);
+    this.vueApp = createApp(ExpenseAnalytics);
     this.vueApp.use(obsidianAppPlugin, { obsidianApp: this.app });
     this.vueApp.mount(container);
   }

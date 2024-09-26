@@ -14,7 +14,7 @@ const initialForm = {
     ]
 };
 
-const { submitting, submitBalance, getBalance } = useBalance();
+const { submitting, submitBalance, getBalance, getPreviousMonthBalance } = useBalance();
 
 const form = ref({ ...initialForm });
 const errorMessage = ref('');
@@ -41,13 +41,26 @@ const loadBalance = async (selectedMonth: string) => {
     const balance = await getBalance(selectedMonth);
 
     if (balance) {
-        form.value.assets = balance.assets.map(asset => ({ ...asset }));
-        form.value.liabilities = balance.liabilities.map(liability => ({ ...liability }));
-        form.value.currency = balance.currency;
+        form.value = {
+            ...balance,
+            assets: balance.assets.map(asset => ({ ...asset })),
+            liabilities: balance.liabilities.map(liability => ({ ...liability }))
+        };
         new Notice(`Баланс за ${selectedMonth} загружен`);
     } else {
-        form.value = { ...initialForm, month: selectedMonth };
-        new Notice(`Баланс за ${selectedMonth} не найден. Создается новый баланс.`);
+        const previousBalance = await getPreviousMonthBalance(selectedMonth);
+        if (previousBalance) {
+            form.value = {
+                ...previousBalance,
+                month: selectedMonth,
+                assets: previousBalance.assets.map(asset => ({ ...asset })),
+                liabilities: previousBalance.liabilities.map(liability => ({ ...liability }))
+            };
+            new Notice(`Баланс за ${selectedMonth} не найден. Загружен баланс за предыдущий месяц.`);
+        } else {
+            form.value = { ...initialForm, month: selectedMonth };
+            new Notice(`Баланс за ${selectedMonth} и предыдущий месяц не найден. Создается новый баланс.`);
+        }
     }
 };
 
