@@ -1,9 +1,16 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { useBalance } from '../composables/useBalance';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
 import { Line } from 'vue-chartjs';
 import dayjs from 'dayjs';
+import { useSettings } from '../composables/useSettings';
+import { getTranslation } from '../translations';
+
+const { settings } = useSettings();
+const language = computed(() => settings.language);
+
+const t = (key: string) => getTranslation(key, language.value);
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
 
@@ -137,20 +144,20 @@ onMounted(async () => {
 
 <template>
     <div>
-        <h2>Аналитика по Балансу</h2>
+        <h2>{{ t('balanceAnalytics') }}</h2>
 
         <div class="chart-container">
-            <h3>Баланс от Времени</h3>
+            <h3>{{ t('balanceOverTime') }}</h3>
             <Line :data="balanceChartData" />
         </div>
 
         <div class="chart-container">
-            <h3>Активы от Времени</h3>
+            <h3>{{ t('assetsOverTime') }}</h3>
             <Line :data="assetsChartData" />
         </div>
 
         <div class="chart-container">
-            <h3>Пассивы от Времени</h3>
+            <h3>{{ t('liabilitiesOverTime') }}</h3>
             <Line :data="liabilitiesChartData" />
         </div>
     </div>

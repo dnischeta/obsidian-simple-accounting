@@ -3,6 +3,8 @@ import { ref, computed, onMounted, watchEffect } from 'vue';
 import { useExpense } from '../composables/useExpense';
 import { Chart as ChartJS, CategoryScale, LinearScale, ArcElement, BarElement, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { Pie, Line, Bar } from 'vue-chartjs';
+import { useSettings } from '../composables/useSettings';
+import { getTranslation } from '../translations';
 
 ChartJS.register(
     CategoryScale,
@@ -16,6 +18,11 @@ ChartJS.register(
     Legend,
     Filler
 );
+
+const { settings } = useSettings();
+const language = computed(() => settings.language);
+
+const t = (key: string) => getTranslation(key, language.value);
 
 // Использование composable для получения расходов
 const { expenses, loading, error, fetchExpenses } = useExpense();
@@ -229,31 +236,31 @@ onMounted(() => {
 
 <template>
     <div>
-        <h2>Аналитика Расходов</h2>
+        <h2>{{ t('expenseAnalytics') }}</h2>
 
-        <div v-if="loading" class="loading">Загрузка данных...</div>
+        <div v-if="loading" class="loading">{{ t('loadingData') }}</div>
         <div v-else-if="error" class="error">{{ error }}</div>
         <div v-else>
             <div class="chart-container">
-                <h3>Ежемесячные расходы</h3>
+                <h3>{{ t('monthlyExpenses') }}</h3>
                 <Line :data="lineChartData" />
             </div>
 
             <div class="chart-container">
-                <label for="month-select">Выберите месяц:</label>
+                <label for="month-select">{{ t('selectMonth') }}:</label>
                 <select id="month-select" v-model="selectedMonth">
-                    <option value="">Все месяцы</option>
+                    <option value="">{{ t('allMonths') }}</option>
                     <option v-for="month in months" :key="month" :value="month">{{ month }}</option>
                 </select>
             </div>
 
             <div class="chart-container">
-                <h3>Распределение расходов по категориям</h3>
+                <h3>{{ t('expenseDistributionByCategory') }}</h3>
                 <Pie :data="pieChartData" />
             </div>
 
             <div class="chart-container">
-                <h3>Расходы по категориям</h3>
+                <h3>{{ t('expensesByCategory') }}</h3>
                 <Bar :data="barChartData" />
             </div>
 

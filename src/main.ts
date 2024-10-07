@@ -3,82 +3,97 @@ import { TransactionView, VIEW_TRANSACTION } from './TransactionView';
 import { BalanceView, VIEW_BALANCE } from './BalanceView';
 import { AnalyticsView, VIEW_ANALYTICS } from './AnalyticsView';
 import { ExpenseAnalyticsView, VIEW_EXPENSE_ANALYTICS } from './ExpenseAnalyticsView';
+import { SimpleAccountingPluginSettings, DEFAULT_SETTINGS, SimpleAccountingSettingTab } from "./settings";
 
 export default class SimpleAccountingPlugin extends Plugin {
-  async onload() {
-    this.app.workspace.onLayoutReady(() => {
-      this.initFiles();
-    });
+	settings: SimpleAccountingPluginSettings = DEFAULT_SETTINGS;
 
-    this.registerView(
-      VIEW_TRANSACTION,
-      (leaf) => new TransactionView(leaf)
-    );
-    this.registerView(
-      VIEW_BALANCE,
-      (leaf) => new BalanceView(leaf)
-    );
-    this.registerView(
-      VIEW_ANALYTICS,
-      (leaf) => new AnalyticsView(leaf)
-    );
+	async onload() {
+		await this.loadSettings();
 
-    this.registerView(
-      VIEW_EXPENSE_ANALYTICS,
-      (leaf) => new ExpenseAnalyticsView(leaf)
-    );
+		this.addSettingTab(new SimpleAccountingSettingTab(this.app, this));
 
-    this.addRibbonIcon("receipt", "Транзакции", () => {
-      this.activateView(VIEW_TRANSACTION);
-    });
+		this.app.workspace.onLayoutReady(() => {
+			this.initFiles();
+		});
 
-    this.addRibbonIcon("scale", "Баланс", () => {
-      this.activateView(VIEW_BALANCE);
-    });
+		this.registerView(
+			VIEW_TRANSACTION,
+			(leaf) => new TransactionView(leaf)
+		);
+		this.registerView(
+			VIEW_BALANCE,
+			(leaf) => new BalanceView(leaf)
+		);
+		this.registerView(
+			VIEW_ANALYTICS,
+			(leaf) => new AnalyticsView(leaf)
+		);
 
-    this.addRibbonIcon("piggy-bank", "Аналитика", () => {
-      this.activateView(VIEW_ANALYTICS);
-    });
+		this.registerView(
+			VIEW_EXPENSE_ANALYTICS,
+			(leaf) => new ExpenseAnalyticsView(leaf)
+		);
 
-    this.addRibbonIcon("coins", "Аналитика Расходов", () => {
-      this.activateView(VIEW_EXPENSE_ANALYTICS);
-    });
-  }
+		this.addRibbonIcon("receipt", "Транзакции", () => {
+			this.activateView(VIEW_TRANSACTION);
+		});
 
-  async onunload() {
-    this.app.workspace.detachLeavesOfType(VIEW_TRANSACTION);
-    this.app.workspace.detachLeavesOfType(VIEW_BALANCE);
-    this.app.workspace.detachLeavesOfType(VIEW_ANALYTICS);
-    this.app.workspace.detachLeavesOfType(VIEW_EXPENSE_ANALYTICS);
-  }
+		this.addRibbonIcon("scale", "Баланс", () => {
+			this.activateView(VIEW_BALANCE);
+		});
 
-  async activateView(viewType: string) {
-    const { workspace } = this.app;
-    let leaf: WorkspaceLeaf | null = null;
-    const leaves = workspace.getLeavesOfType(viewType);
+		this.addRibbonIcon("piggy-bank", "Аналитика", () => {
+			this.activateView(VIEW_ANALYTICS);
+		});
 
-    if (leaves.length > 0) {
-      leaf = leaves[0];
-    } else {
-      leaf = workspace.getRightLeaf(false);
-      await leaf!.setViewState({ type: viewType, active: true });
-    }
+		this.addRibbonIcon("coins", "Аналитика Расходов", () => {
+			this.activateView(VIEW_EXPENSE_ANALYTICS);
+		});
+	}
 
-    workspace.revealLeaf(leaf!);
-  }
+	async onunload() {
+		this.app.workspace.detachLeavesOfType(VIEW_TRANSACTION);
+		this.app.workspace.detachLeavesOfType(VIEW_BALANCE);
+		this.app.workspace.detachLeavesOfType(VIEW_ANALYTICS);
+		this.app.workspace.detachLeavesOfType(VIEW_EXPENSE_ANALYTICS);
+	}
 
-  private async initFiles() {
-    const vault = this.app.vault;
+	async activateView(viewType: string) {
+		const { workspace } = this.app;
+		let leaf: WorkspaceLeaf | null = null;
+		const leaves = workspace.getLeavesOfType(viewType);
 
-    const balanceDir = vault.getAbstractFileByPath('Баланс');
-    if (!balanceDir) {
-      await vault.createFolder('Баланс');
-    }
+		if (leaves.length > 0) {
+			leaf = leaves[0];
+		} else {
+			leaf = workspace.getRightLeaf(false);
+			await leaf!.setViewState({ type: viewType, active: true });
+		}
 
-    const transactionFile = vault.getFiles().find(file => file.name === 'Расходы.md');
+		workspace.revealLeaf(leaf!);
+	}
 
-    if (!transactionFile) {
-      await vault.create('Расходы.md', '');
-    }
-  }
+	private async initFiles() {
+		const vault = this.app.vault;
+
+		const balanceDir = vault.getAbstractFileByPath('Баланс');
+		if (!balanceDir) {
+			await vault.createFolder('Баланс');
+		}
+
+		const transactionFile = vault.getFiles().find(file => file.name === 'Расходы.md');
+
+		if (!transactionFile) {
+			await vault.create('Расходы.md', '');
+		}
+	}
+
+	async loadSettings() {
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+	}
+
+	async saveSettings() {
+		await this.saveData(this.settings);
+	}
 }

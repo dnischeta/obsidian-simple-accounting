@@ -1,7 +1,14 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 import { useBalance } from '../composables/useBalance';
 import { Notice } from 'obsidian';
+import { useSettings } from '../composables/useSettings';
+import { getTranslation } from '../translations';
+
+const { settings } = useSettings();
+const language = computed(() => settings.language);
+
+const t = (key: string) => getTranslation(key, language.value);
 
 const initialForm = {
     month: '',
@@ -96,35 +103,35 @@ const submitForm = async () => {
 
 <template>
     <div>
-        <h2>Создать баланс</h2>
+        <h2>{{ t('createBalance') }}</h2>
         <form class="form" :disabled="submitting" @submit.prevent="submitForm">
             <div class="form-item">
-                <label for="month">Месяц:</label>
+                <label for="month">{{ t('month') }}:</label>
                 <input type="month" id="month" v-model="form.month" required />
             </div>
             <div class="form-item">
-                <label for="currency">Валюта:</label>
+                <label for="currency">{{ t('currency') }}:</label>
                 <input type="text" id="currency" v-model="form.currency" required />
             </div>
             <div class="form-item">
-                <h3>Активы</h3>
+                <h3>{{ t('assets') }}</h3>
                 <div v-for="(asset, index) in form.assets" :key="index" class="nested-form-item">
-                    <input type="text" v-model="asset.name" placeholder="Название актива" required />
-                    <input type="number" v-model="asset.amount" placeholder="Сумма" min="0" required />
-                    <button type="button" @click="removeAsset(index)">Удалить</button>
+                    <input type="text" v-model="asset.name" :placeholder="t('assetName')" required />
+                    <input type="number" v-model="asset.amount" :placeholder="t('amount')" min="0" required />
+                    <button type="button" @click="removeAsset(index)">{{ t('remove') }}</button>
                 </div>
-                <button type="button" @click="addAsset">Добавить актив</button>
+                <button type="button" @click="addAsset">{{ t('addAsset') }}</button>
             </div>
             <div class="form-item">
-                <h3>Пассивы</h3>
+                <h3>{{ t('liabilities') }}</h3>
                 <div v-for="(liability, index) in form.liabilities" :key="index" class="nested-form-item">
-                    <input type="text" v-model="liability.name" placeholder="Название пассива" required />
-                    <input type="number" v-model="liability.amount" placeholder="Сумма" min="0" required />
-                    <button type="button" @click="removeLiability(index)">Удалить</button>
+                    <input type="text" v-model="liability.name" :placeholder="t('liabilityName')" required />
+                    <input type="number" v-model="liability.amount" :placeholder="t('amount')" min="0" required />
+                    <button type="button" @click="removeLiability(index)">{{ t('remove') }}</button>
                 </div>
-                <button type="button" @click="addLiability">Добавить пассив</button>
+                <button type="button" @click="addLiability">{{ t('addLiability') }}</button>
             </div>
-            <button type="submit" :disabled="submitting">Сохранить баланс</button>
+            <button type="submit" :disabled="submitting">{{ t('saveBalance') }}</button>
             <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
         </form>
     </div>
